@@ -1,0 +1,37 @@
+// Ejemplo de Objectilang que usa la mayoria de construcciones
+
+object Animal[+T](name: String)
+
+object Dog extends Animal {
+  override speak(): String = {
+    "Guau"
+  }
+}
+
+object Counter(start: Int) {
+  var count: Int = 0
+
+  method increment(step: Int): Int = {
+    val next: Int = count + step
+    println("Counter: ${next}")
+    next * 2
+  }
+}
+
+val c: Counter = new Counter(5)
+c.increment = method(step: Int): Int { step + 1 }
+
+val d = new Animal[Int]("x") {
+  method speak(): String = { "hola" }
+}
+
+val area = 3.14 * radius ** 2 + (a - b) / 2 % 3
+val ok = neg flag and (n >= 0 or n <> 5)
+
+if n > 0 then println("positivo") else println("no positivo")
+
+for (i = 0, i < 10, i++) println("i = ${i}")
+for (item <- items) println(item)
+for ((k, v) in pairs) {
+  println("${k} -> ${v}")
+}
