@@ -30,9 +30,3 @@ objectilang/
    :test
    ```
 3. Abrir `examples/ejemplo1.obj`: debe verse con colores y sin errores.
-
-## Notas de versión
-
-- Probado con la estructura de proyecto basada en `pom.xml` (`src/main/rascal`). Si su curso usa la estructura antigua (carpeta `src/`), muevan `lang/` a `src/` y ajusten `Source:` en `META-INF/RASCAL.MF`.
-- Si cambian de versión de Rascal, en versiones recientes `parser(...)` en `Plugin.rsc` puede llamarse `parsing(...)`.
-- Las partes opcionales (`X?`) se representan en el AST como `list[X]` con 0 o 1 elemento.
