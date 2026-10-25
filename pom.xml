@@ -10,7 +10,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- Ajustar a la version de Rascal que use el curso -->
     <rascal.version>0.43.0</rascal.version>
   </properties>
 

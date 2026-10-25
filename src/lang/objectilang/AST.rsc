@@ -49,8 +49,8 @@ data AExtension
   ;
 
 data AMethodDef
-  = methodAssign(str objName, list[str] path, AParams parameters,
-                 ATypeAnn returnType, ABlock body)
+  = methodAssign(str objName, list[str] path, AParams requiredParameters,
+                 list[ATypeAnn] returnType, ABlock body)
   | methodDef(list[str] name, list[AParams] parameters,
               list[ATypeAnn] returnType, ABlock body)
   | overrideDef(list[str] name, list[AParams] parameters,
@@ -67,6 +67,7 @@ data AParams
 
 data AParam
   = param(str name, ATypeExpr typ)
+  | valParam(str name, ATypeExpr typ)
   ;
 
 data ATypeParams

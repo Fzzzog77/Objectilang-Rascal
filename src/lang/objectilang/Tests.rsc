@@ -1,12 +1,7 @@
 module lang::objectilang::Tests
 
-/*
- * Pruebas basicas. En el REPL de Rascal:
- *   import lang::objectilang::Tests;
- *   :test
- */
-
 import ParseTree;
+import Exception;
 import lang::objectilang::AST;
 import lang::objectilang::Implode;
 
@@ -23,16 +18,35 @@ test bool tVal() = parses("val x: Int = 1 + 2 * 3");
 
 test bool tVar() = parses("var y = 2.5");
 
+test bool tNegativoEnDeclaracion() = parses("val x = -2");
+
+test bool tNegativoComoExpresion() =
+  parses("method f(): Int = { -2 }");
+
 test bool tObject() =
   parses("object A extends B [+T, -U] (x: Int, y: String) { val z = x }");
 
+test bool tParametroValObjeto() =
+  parses("object List [+A](val item : A)");
+
 test bool tObjectSinCuerpo() = parses("object A");
+
+test bool tMetodoSinIgual() =
+  parses("method main { val x = 1 }");
+
+test bool tImplodeMetodoSinIgual() =
+  program([methodStmt(methodDef(["main"], [], [],
+    block([valDecl("x", [], intLit(1))])))]) :=
+      loadAST("method main { val x = 1 }");
 
 test bool tMetodos() =
   parses("method f(x: Int): Int = { x + 1 }\noverride g = { 1 }");
 
 test bool tMetodoAsignado() =
   parses("c.inc = method(step: Int): Int { step + 1 }");
+
+test bool tMetodoAsignadoSinTipo() =
+  parses("c.inc = method(step: Int) { step + 1 }");
 
 test bool tIf() =
   parses("if a = b then println(\"si\") else println(\"no\")");
@@ -57,11 +71,11 @@ test bool tRechazaValSinNombre() = !parses("val = 3");
 test bool tRechazaReservada() = !parses("val if = 3");
 
 test bool tPrecedencia() =
-  loadAST("val x = 1 + 2 * 3") ==
   program([valDecl("x", [],
-    add(intLit(1), multiply(intLit(2), intLit(3))))]);
+    add(intLit(1), multiply(intLit(2), intLit(3))))]) :=
+      loadAST("val x = 1 + 2 * 3");
 
 test bool tAsociatividadIzquierda() =
-  loadAST("val x = 1 - 2 - 3") ==
   program([valDecl("x", [],
-    subtract(subtract(intLit(1), intLit(2)), intLit(3)))]);
+    subtract(subtract(intLit(1), intLit(2)), intLit(3)))]) :=
+      loadAST("val x = (1 - 2 - 3)");

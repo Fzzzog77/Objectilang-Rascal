@@ -1,15 +1,4 @@
-module src::main::rascal::lang::objectilang::Syntax
-
-/*
- * Objectilang - sintaxis concreta (Proyecto 2, Grupo 13)
- *
- * Basada en la gramatica del Proyecto 1, con las correcciones descritas en
- * el documento "Cambios a la gramatica". Las anotaciones @category son las
- * que alimentan el resaltado de sintaxis en VS Code.
- *
- * Nota: las palabras reservadas (literales) se resaltan como keywords por
- * defecto; los tokens lexicos llevan su categoria explicita.
- */
+module lang::objectilang::Syntax
 
 // ---------------------------------------------------------------------------
 // Layout (espacios y comentarios)
@@ -23,9 +12,8 @@ lexical WhitespaceAndComment
   | @category="Comment" "/*" (![*] | [*] !>> [/])* "*/"
   ;
 
-// ---------------------------------------------------------------------------
+
 // Palabras reservadas
-// ---------------------------------------------------------------------------
 
 keyword Reserved
   = "object" | "extends" | "method" | "override" | "val" | "var" | "new"
@@ -33,9 +21,7 @@ keyword Reserved
   | "and" | "or" | "neg" | "print" | "println"
   ;
 
-// ---------------------------------------------------------------------------
 // Tokens
-// ---------------------------------------------------------------------------
 
 lexical Id
   = @category="Variable" ([a-zA-Z] [a-zA-Z0-9]* !>> [a-zA-Z0-9]) \ Reserved
@@ -45,16 +31,15 @@ lexical TypeName
   = @category="Type" ([a-zA-Z] [a-zA-Z0-9]* !>> [a-zA-Z0-9]) \ Reserved
   ;
 
-lexical IntLit   = @category="Constant" [0-9]+ !>> [0-9];
-lexical FloatLit = @category="Constant" [0-9]+ "." [0-9]+ !>> [0-9];
+lexical Digits   = [0-9]+ !>> [0-9];
+lexical IntLit   = @category="Constant" Digits;
+lexical FloatLit = @category="Constant" Digits "." Digits;
 
 // Operador/palabra de los ciclos: "<-" o "in"
 lexical Generator = "\<-" | "in" !>> [a-zA-Z0-9];
 
-// Cadenas. Soportan interpolacion con ${ Expresion }.
-// Se parten en trozos lexicos (como hace Rascal con sus propios strings):
-//   "texto"                      -> StringPlain
-//   "pre ${ e1 } mid ${ e2 } post" -> StringPre e1 StringMid e2 StringPost
+// Cadenas. Soportan interpolacion con ${ Expresion } 
+
 lexical StringChar
   = ![\"\\$\n\r]
   | [$] !>> [{]
@@ -66,9 +51,7 @@ lexical StringPre   = @category="Constant" "\"" StringChar* "${";
 lexical StringMid   = @category="Constant" "}" StringChar* "${";
 lexical StringPost  = @category="Constant" "}" StringChar* "\"";
 
-// ---------------------------------------------------------------------------
-// Programa y sentencias
-// ---------------------------------------------------------------------------
+// Programa y sentenciaS
 
 start syntax Program
   = program: Statement*
@@ -93,15 +76,13 @@ syntax Block
   = block: "{" Statement* "}"
   ;
 
-// Cuerpo de if/for: un bloque o una unica sentencia
+// Cuerpo de if/for
 syntax Body
   = blockBody: Block
   | singleBody: Statement
   ;
 
-// ---------------------------------------------------------------------------
 // Objetos y metodos
-// ---------------------------------------------------------------------------
 
 syntax ObjectDef
   = objectDef: "object" Id Extension? TypeParams? Params? Block?
@@ -112,8 +93,9 @@ syntax Extension
   ;
 
 syntax MethodDef
-  = methodAssign: Id "." {Id "."}+ "=" "method" Params TypeAnn Block
+  = methodAssign: Id "." {Id "."}+ "=" "method" Params TypeAnn? Block
   | methodDef: "method" Id? Params? TypeAnn? "=" Block
+  | methodDef: "method" Id? Params? TypeAnn? Block
   | overrideDef: "override" Id? Params? TypeAnn? "=" Block
   ;
 
@@ -122,9 +104,7 @@ syntax ObjectBody
   = objectBody: "{" MethodDef* "}"
   ;
 
-// ---------------------------------------------------------------------------
 // Parametros y tipos
-// ---------------------------------------------------------------------------
 
 syntax Params
   = params: "(" {Param ","}* ")"
@@ -132,6 +112,7 @@ syntax Params
 
 syntax Param
   = param: Id ":" TypeExpr
+  | valParam: "val" Id ":" TypeExpr
   ;
 
 syntax TypeParams
@@ -157,12 +138,10 @@ syntax TypeExpr
   | genericType: TypeName TypeArgs
   ;
 
-// ---------------------------------------------------------------------------
-// Expresiones
-// ---------------------------------------------------------------------------
+// Expresiones e Invocaciones
 
 syntax Invocation
-  = invocation: {Id "."}+ TypeArgs? CallArgs?
+  = invocation: {Id "."}+ TypeArgs? CallArgs? !>> "("
   ;
 
 syntax CallArgs
@@ -186,7 +165,7 @@ syntax Expression
   | trueLit: "true"
   | falseLit: "false"
   | callExpr: Invocation
-  | newObject: "new" Id TypeArgs? CallArgs? ObjectBody?
+  | newObject: "new" Id TypeArgs? CallArgs? ObjectBody? !>> "("
   | bracket "(" Expression ")"
   > negate: "-" Expression
   | logicalNot: "neg" Expression
